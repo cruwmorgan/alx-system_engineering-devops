@@ -1,2 +1,2 @@
 #!/bin/bash
-chmod 740 hello
+git update-index --chmod=+x hello
