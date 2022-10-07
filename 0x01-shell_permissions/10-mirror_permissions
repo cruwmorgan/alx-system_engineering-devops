@@ -1,2 +1,2 @@
 #!/bin/bash
-chmod stat -c hello olleh
+chmod -c hello olleh
