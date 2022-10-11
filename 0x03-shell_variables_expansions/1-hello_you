@@ -1,2 +1,2 @@
 #!/bin/bash
-user=$USERNAME | echo "hello $user"
+set user="$USERNAME" | echo "hello $user"
