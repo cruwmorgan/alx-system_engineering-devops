@@ -3,10 +3,10 @@ file { '/etc/ssh/ssh_config':
   ensure => present,
 }->
 file_line { 'To disable password login':
-  path => '~/etc/ssh/ssh_config',
+  path => '/etc/ssh/ssh_config',
   line => 'PasswordAuthentication no',
 }
 file_line { 'to add path to find the keys':
-  path => '~/etc/ssh/ssh_config',
+  path => '/etc/ssh/ssh_config',
   line => 'IdentityFile ~/.ssh/school',
 }
