@@ -7,6 +7,6 @@ file_line { 'To disable password login':
   line => 'PasswordAuthentication no',
 }
 file_line { 'to add path to find the keys':
-  path => '/etc/ssh/ssh_config',
+  path => '~/etc/ssh/ssh_config',
   line => 'IdentityFile ~/.ssh/school',
 }
