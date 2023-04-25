@@ -2,7 +2,5 @@
 # Install nginx web server
 sudo apt-get -y update && sudo apt-get -y upgrade
 sudo apt-get -y install nginx
-sudo service nginx start
-sudo ufw allow 'Nginx HTTP'
 echo "Hellp World!" > /var/www/html/index.html
 service nginx restart
