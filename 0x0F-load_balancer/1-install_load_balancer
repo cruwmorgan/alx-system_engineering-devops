@@ -9,5 +9,6 @@ echo -e "\nlisten 181075-lb-01\n\tbind *:80\n\tmode http\n\tstats \
 	enable\n\tbalance roundrobin\n\toption forwardfor\n\tserver \
 	181075-web-01 54.165.42.62:80 check\n\tserver 181075-web-02 \
 	54.160.108.20:80 check\n" >> /etc/haproxy/haproxy.cfg
-
+sudo chown  $USER:$USER /etc/default/haproxy
+echo "ENABLED=1" >> /etc/default/haproxy
 service haproxy restart
