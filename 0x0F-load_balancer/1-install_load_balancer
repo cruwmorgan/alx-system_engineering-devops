@@ -4,6 +4,7 @@ apt-get install --no-install-recommends software-properties-common
 add-apt-repository ppa:vbernat/haproxy-2.7
 apt-get -y update
 apt-get install haproxy=2.7.\*
+sudo chown  $USER:$USER /etc/haproxy/haproxy.cfg
 echo -e "\nlisten 181075-lb-01\n\tbind *:80\n\tmode http\n\tstats \
 	enable\n\tbalance roundrobin\n\toption forwardfor\n\tserver \
 	181075-web-01 54.165.42.62:80 check\n\tserver 181075-web-02 \
