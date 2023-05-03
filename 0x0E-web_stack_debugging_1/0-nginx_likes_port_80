@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# fixing nginx port 80 listening issue
+cp -f /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+service nginx restart
