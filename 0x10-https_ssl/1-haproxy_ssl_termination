@@ -1,4 +1,7 @@
+# HAproxy configuration file
 global
+        maxconn 2048
+        tune.ssl.default-dh-param 2048
         log /dev/log    local0
         log /dev/log    local1 notice
         chroot /var/lib/haproxy
@@ -32,6 +35,8 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
+        option forwardfor
+        option http-server-close
 
 listen 181075-lb-01
         bind *:80
@@ -41,3 +46,23 @@ listen 181075-lb-01
         option forwardfor
         server 181075-web-01 54.165.42.62:80 check
         server 181075-web-02 54.160.108.20:80 check
+
+frontend www-http
+        bind 100.25.154.226:80
+        add_header X-Forwarded-Proto http
+        default_backend www-backend
+
+frontend www-https
+        bind 100.25.154.226:443 ssl crt /etc/haproxy/certs/www.cruwmorgan.tech.pem
+        add_header X-Forwarded-Proto https
+        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+        use_backend letsencrypt-backend if letsencrypt-acl
+        default_backend www-backend
+
+backend www-backend
+        redirect scheme https if !{ ssl_fc }
+        server 181075-web-01 54.165.42.62:80 check
+        server 181075-web-02 54.160.108.20:80 check
+
+backend letsencrypt-backend
+	server letsencrypt 127.0.0.1:54321
