@@ -1,21 +1,11 @@
 #!/usr/bin/env bash
 # Install and configure HAproxy on your lb-01 server.
 apt-get install --no-install-recommends software-properties-common
-add-apt-repository ppa:vbernat/haproxy-2.7
+add-apt-repository ppa:vbernat/haproxy-2.4
 apt-get -y update
-apt-get install haproxy=2.7.\*
-sudo chown  $USER:$USER /etc/haproxy/haproxy.cfg
+apt-get install haproxy=2.4.\*
 echo "frontend fe-cruwmorgan
         bind *:80
-
-        # This is our new config that listens on port 443 for SSL connections
-        bind *:443 ssl crt /etc/ssl/www.cruwmorgan.tech/www.cruwmorgan.tech.pem
-
-        redirect scheme https code 301 if !{ ssl_fc }
-
-        # New line to test URI to see if its a letsencrypt request
-        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
-        use_backend letsencrypt-backend if letsencrypt-acl
 
         default_backend be-cruwmorgan
 
@@ -28,5 +18,4 @@ backend be-cruwmorgan
         option httpchk GET / HTTP/1.1\r\nHost:cruwmorgan.tech
         server 181075-web-01 54.165.42.62:80 check
         server 181075-web-02 54.160.108.20:80 check" >> /etc/haproxy/haproxy.cfg
-sudo chown  $USER:$USER /etc/default/haproxy
 service haproxy restart
