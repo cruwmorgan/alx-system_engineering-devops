@@ -5,10 +5,28 @@ add-apt-repository ppa:vbernat/haproxy-2.7
 apt-get -y update
 apt-get install haproxy=2.7.\*
 sudo chown  $USER:$USER /etc/haproxy/haproxy.cfg
-echo -e "\nlisten 181075-lb-01\n\tbind *:80\n\tmode http\n\tstats \
-	enable\n\tbalance roundrobin\n\toption forwardfor\n\tserver \
-	181075-web-01 54.165.42.62:80 check\n\tserver 181075-web-02 \
-	54.160.108.20:80 check\n" >> /etc/haproxy/haproxy.cfg
+echo "frontend fe-cruwmorgan
+        bind *:80
+
+        # This is our new config that listens on port 443 for SSL connections
+        bind *:443 ssl crt /etc/ssl/www.cruwmorgan.tech/www.cruwmorgan.tech.pem
+
+        redirect scheme https code 301 if !{ ssl_fc }
+
+        # New line to test URI to see if its a letsencrypt request
+        acl letsencrypt-acl path_beg /.well-known/acme-challenge/
+        use_backend letsencrypt-backend if letsencrypt-acl
+
+        default_backend be-cruwmorgan
+
+backend be-cruwmorgan
+        balance roundrobin
+        option forwardfor
+        http-request set-header X-Forwarded-Port %[dst_port]
+        http-request set-header X-Forwarded-Proto https if { ssl_fc }
+
+        option httpchk GET / HTTP/1.1\r\nHost:cruwmorgan.tech
+        server 181075-web-01 54.165.42.62:80 check
+        server 181075-web-02 54.160.108.20:80 check" >> /etc/haproxy/haproxy.cfg
 sudo chown  $USER:$USER /etc/default/haproxy
-echo "ENABLED=1" >> /etc/default/haproxy
 service haproxy restart
