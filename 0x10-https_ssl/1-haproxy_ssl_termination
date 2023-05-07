@@ -1,11 +1,9 @@
-# HAproxy configuration file
+# Share your HAproxy config as an answer file (/etc/haproxy/haproxy.cfg)
 global
-        maxconn 2048
-        tune.ssl.default-dh-param 2048
         log /dev/log    local0
         log /dev/log    local1 notice
         chroot /var/lib/haproxy
-        stats socket /run/haproxy/admin.sock mode 660 level admin
+        stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
         stats timeout 30s
         user haproxy
         group haproxy
@@ -35,34 +33,31 @@ defaults
         errorfile 502 /etc/haproxy/errors/502.http
         errorfile 503 /etc/haproxy/errors/503.http
         errorfile 504 /etc/haproxy/errors/504.http
-        option forwardfor
-        option http-server-close
 
-listen 181075-lb-01
+frontend fe-cruwmorgan
         bind *:80
-        mode http
-        stats enable
-        balance roundrobin
-        option forwardfor
-        server 181075-web-01 54.165.42.62:80 check
-        server 181075-web-02 54.160.108.20:80 check
 
-frontend www-http
-        bind 100.25.154.226:80
-        add_header X-Forwarded-Proto http
-        default_backend www-backend
+        # This is our new config that listens on port 443 for SSL connections
+        bind *:443 ssl crt /etc/ssl/www.cruwmorgan.tech/www.cruwmorgan.tech.pem
 
-frontend www-https
-        bind 100.25.154.226:443 ssl crt /etc/haproxy/certs/www.cruwmorgan.tech.pem
-        add_header X-Forwarded-Proto https
+        redirect scheme https code 301 if !{ ssl_fc }
+
+        # New line to test URI to see if its a letsencrypt request
         acl letsencrypt-acl path_beg /.well-known/acme-challenge/
         use_backend letsencrypt-backend if letsencrypt-acl
-        default_backend www-backend
 
-backend www-backend
-        redirect scheme https if !{ ssl_fc }
+        default_backend be-cruwmorgan
+
+backend be-cruwmorgan
+        balance roundrobin
+        option forwardfor
+        http-request set-header X-Forwarded-Port %[dst_port]
+        http-request set-header X-Forwarded-Proto https if { ssl_fc }
+
+        option httpchk GET / HTTP/1.1\r\nHost:cruwmorgan.tech
         server 181075-web-01 54.165.42.62:80 check
         server 181075-web-02 54.160.108.20:80 check
 
+# LE Backend
 backend letsencrypt-backend
-	server letsencrypt 127.0.0.1:54321
+        server letsencrypt 127.0.0.1:8888
