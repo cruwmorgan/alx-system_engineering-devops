@@ -1,0 +1,10 @@
+sudo apt update -y
+sudo apt install ufw -y
+sudo ufw allow 22
+# HTTP connection uses port 80 (not secure)
+sudo ufw allow 80
+sudo ufw allow http
+sudo ufw allow https
+# HTTP connection uses port 443 (secure)
+sudo ufw allow 443
+sudo ufw enable
