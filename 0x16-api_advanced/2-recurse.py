@@ -6,8 +6,8 @@ from json import loads
 from requests import get
 
 
-def recurse(subreddit, hot_list=[]):
-    url = 'https://www.reddit.com/r/{}/hot.json?limit=100&&after={}' \
+def recurse(subreddit, hot_list=[], after=None):
+    url = 'https://www.reddit.com/r/{}/hot.json?limit=100&&after={}'\
            .format(subreddit, after)
     headers = {
         'User-Agent':
@@ -30,5 +30,4 @@ def recurse(subreddit, hot_list=[]):
         return recurse(subreddit, hot_list, after)
 
     except:
-        print(None)
-        return 0
+        return None
