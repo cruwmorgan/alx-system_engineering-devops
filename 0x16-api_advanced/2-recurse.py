@@ -7,7 +7,8 @@ from requests import get
 
 
 def recurse(subreddit, hot_list=[]):
-    url = 'https://www.reddit.com/r/{}/hot.json'.format(subreddit)
+    url = 'https://www.reddit.com/r/{}/hot.json?limit=100&&after={}' \
+           .format(subreddit, after)
     headers = {
         'User-Agent':
         'Mozilla/5.0 (Windows; U; Windows NT 5.1; de; rv:1.9.2.3) \
@@ -18,9 +19,16 @@ def recurse(subreddit, hot_list=[]):
 
     try:
         children = reddits.get('data').get('children')
-        for title in children:
-            hot_list.append(title.get('data').get('title'))
-        return hot_list
+        for title in range(len(children)):
+            hot_list.append(children[title]
+                            ['data']['title'])
+
+        after = reddits.get('data').get('after')
+        if after is None:
+            return hot_list
+
+        return recurse(subreddit, hot_list, after)
+
     except:
         print(None)
         return 0
