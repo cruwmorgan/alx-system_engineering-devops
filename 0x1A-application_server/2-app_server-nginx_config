@@ -1,0 +1,12 @@
+server {
+        listen 80;
+        server_name cruwmorgan.tech www.cruwmorgan.tech;
+
+        access_log /var/log/nginx/AirBnB_clone_v2.access.log;
+        error_log /var/log/nginx/AirBnB_clone_v2.error.log;
+
+        location / {
+                include proxy_params;
+                proxy_pass http://unix:/var/www/AirBnB_clone_v2/AirBnB_clone_v2.sock;
+        }
+}
